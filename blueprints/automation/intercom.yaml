@@ -25,6 +25,7 @@ mode: restart
 trigger:
   - platform: state
     entity_id: !input trigger_entity
+    to: "on"
 
 condition:
   - condition: template
