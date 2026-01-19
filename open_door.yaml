@@ -18,8 +18,8 @@ blueprint:
       name: "Enviar notificación al móvil"
       description: "Selecciona notify.mobile_app_..."
       selector:
-        action:
-          multiple: true
+        action: {}
+      default: []
 
 mode: restart
 
