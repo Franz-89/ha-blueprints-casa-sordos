@@ -1,0 +1,69 @@
+blueprint:
+  name: "Lavavajillas"
+  description: "Detecta inicio por consumo, espera fin y avisa: Notificación + Verde 5 min"
+  domain: automation
+  input:
+    power_sensor:
+      name: "Sensor potencia (W)"
+      selector:
+        entity:
+          domain: sensor
+    lights:
+      name: "Luces afectadas"
+      selector:
+        target:
+          entity:
+            domain: light
+    notify_actions:
+      name: "Enviar notificación al móvil"
+      description: "Selecciona notify.mobile_app_..."
+      selector:
+        action:
+          multiple: true
+
+mode: restart
+
+# Fixed values
+# start: >25W during 30s
+# stop: <6W during 12min
+trigger:
+  - platform: numeric_state
+    entity_id: !input power_sensor
+    above: 25
+    for:
+      seconds: 30
+
+action:
+  # Wait until end (if not finished in 8h, it cancels)
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: !input power_sensor
+        below: 6
+        for:
+          minutes: 12
+    timeout:
+      hours: 8
+    continue_on_timeout: false
+
+  # Immediate notification
+  - !input notify_actions
+
+  # Fixed green light during 5min
+  - service: light.turn_on
+    target: !input lights
+    data:
+      rgb_color: [0, 255, 0] # Green
+      brightness_pct: 100
+  - delay:
+      minutes: 5
+
+  # Reset lights
+  - service: light.turn_on
+    target: !input lights
+    data:
+      kelvin: 2700
+      brightness_pct: 100
+  - delay:
+      seconds: 1
+  - service: light.turn_off
+    target: !input lights

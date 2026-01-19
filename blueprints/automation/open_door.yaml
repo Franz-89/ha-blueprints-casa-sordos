@@ -1,0 +1,62 @@
+blueprint:
+  name: "Puerta abierta 5 min (bloqueado) → Parpadeo ROJO 30s + Notificación"
+  description: "En caso de puerta abirta durante màs de 5min: Notificación + Parpadeo ROJO 30s"
+  domain: automation
+  input:
+    contact_sensor:
+      name: "Sensor puerta"
+      selector:
+        entity:
+          domain: binary_sensor
+    lights:
+      name: "Luces afectadas"
+      selector:
+        target:
+          entity:
+            domain: light
+    notify_actions:
+      name: "Enviar notificación al móvil"
+      description: "Selecciona notify.mobile_app_..."
+      selector:
+        action:
+          multiple: true
+
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: !input contact_sensor
+    to: "on"
+    for:
+      minutes: 5
+
+action:
+  # Immediate notification
+  - !input notify_actions
+
+  # Flashing red light 30s (0.5 on / 0.5 off -> 30 cycles)
+  - repeat:
+      count: 30
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+          data:
+            rgb_color: [255, 0, 0]
+            brightness_pct: 100
+        - delay:
+            milliseconds: 500
+        - service: light.turn_off
+          target: !input lights
+        - delay:
+            milliseconds: 500
+
+  # Reset lights
+  - service: light.turn_on
+    target: !input lights
+    data:
+      kelvin: 2700
+      brightness_pct: 100
+  - delay:
+      seconds: 1
+  - service: light.turn_off
+    target: !input lights

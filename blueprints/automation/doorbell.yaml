@@ -1,0 +1,62 @@
+blueprint:
+  name: "Timbre"
+  description: "Cuando tocan el timbre: Notificación + Parpadeo blanco cálido 30s"
+  domain: automation
+  input:
+    trigger_entity:
+      name: "Sensor del timbre"
+      selector:
+        entity: {}
+    lights:
+      name: "Luces afectadas"
+      selector:
+        target:
+          entity:
+            domain: light
+    notify_actions:
+      name: "Enviar notificación al móvil"
+      description: "Selecciona notify.mobile_app_..."
+      selector:
+        action:
+          multiple: true
+
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: !input trigger_entity
+
+condition:
+  - condition: template
+    value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+
+action:
+  # Immediate notification
+  - !input notify_actions
+
+  # Flashing warm white light 30s
+  - repeat:
+      count: 30
+      sequence:
+        - service: light.turn_on
+          target: !input lights
+          data:
+            kelvin: 2700
+            brightness_pct: 100
+        - delay:
+            milliseconds: 500
+        - service: light.turn_off
+          target: !input lights
+        - delay:
+            milliseconds: 500
+
+  # Reset lights
+  - service: light.turn_on
+    target: !input lights
+    data:
+      kelvin: 2700
+      brightness_pct: 100
+  - delay:
+      seconds: 1
+  - service: light.turn_off
+    target: !input lights
