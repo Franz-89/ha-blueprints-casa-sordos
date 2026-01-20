@@ -16,7 +16,7 @@ blueprint:
             domain: light
     notify_actions:
       name: "Enviar notificación al móvil (puedes añadir varios)"
-      description: "Selecciona notify.mobile_app_..."
+      description: "Busca 'mobile_' en la barra de busqueda y selecciona un mòvil"
       selector:
         action: {}
       default: []
