@@ -1,5 +1,5 @@
 blueprint:
-  name: "Puerta abierta 5 min (bloqueado) → Parpadeo ROJO 30s + Notificación"
+  name: "Puerta abierta"
   description: "En caso de puerta abierta durante màs de 5min: Notificación + Parpadeo ROJO 30s"
   domain: automation
   input:
