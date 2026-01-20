@@ -14,7 +14,7 @@ blueprint:
           entity:
             domain: light
     notify_actions:
-      name: "Enviar notificación al móvil"
+      name: "Enviar notificación al móvil (puedes añadir varios)"
       description: "Selecciona notify.mobile_app_..."
       selector:
         action: {}

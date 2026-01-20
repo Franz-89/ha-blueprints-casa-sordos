@@ -1,0 +1,86 @@
+blueprint:
+  name: "Bebé (actividad en cuna)"
+  description: "Detecta movimiento durante màs de 2 segundos en la habitación del bebé y avisa: Notificación + Parpadeo VIOLETA. Antes de las 20:00 parpadea 10s. De 20:00 a 09:00 parpadea 1 minuto."
+  domain: automation
+  input:
+    motion_sensor:
+      name: "Sensor de movimiento"
+      description: "Sensor de movimiento"
+      selector:
+        entity:
+          domain: binary_sensor
+    lights:
+      name: "Luces afectadas"
+      selector:
+        target:
+          entity:
+            domain: light
+    notify_actions:
+      name: "Enviar notificación al móvil (puedes añadir varios)"
+      description: "Selecciona notify.mobile_app_..."
+      selector:
+        action: {}
+      default: []
+
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: !input motion_sensor
+    to: "on"
+    for:
+      seconds: 2
+
+action:
+  # Immediate notification
+  - !input notify_actions
+
+  # Purple blinking: 10s before 20:00, 1 min from 20:00 to 09:00
+  - choose:
+      - conditions:
+          - condition: time
+            after: "20:00:00"
+            before: "09:00:00"
+        sequence:
+          # 1 minute = 60 cycles (0.5s ON + 0.5s OFF)
+          - repeat:
+              count: 60
+              sequence:
+                - service: light.turn_on
+                  target: !input lights
+                  data:
+                    rgb_color: [128, 0, 255]  # Purple
+                    brightness_pct: 100
+                - delay:
+                    milliseconds: 500
+                - service: light.turn_off
+                  target: !input lights
+                - delay:
+                    milliseconds: 500
+    default:
+      # Before 20:00 (and after 09:00) = 10 seconds
+      - repeat:
+          count: 10
+          sequence:
+            - service: light.turn_on
+              target: !input lights
+              data:
+                rgb_color: [128, 0, 255]  # Purple
+                brightness_pct: 100
+            - delay:
+                milliseconds: 500
+            - service: light.turn_off
+              target: !input lights
+            - delay:
+                milliseconds: 500
+
+  # Reset lights
+  - service: light.turn_on
+    target: !input lights
+    data:
+      kelvin: 2700
+      brightness_pct: 100
+  - delay:
+      seconds: 1
+  - service: light.turn_off
+    target: !input lights
