@@ -5,7 +5,6 @@ blueprint:
   input:
     motion_sensor:
       name: "Sensor de movimiento"
-      description: "Sensor de movimiento"
       selector:
         entity:
           domain: binary_sensor
