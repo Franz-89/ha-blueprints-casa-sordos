@@ -34,7 +34,7 @@ action:
   # Immediate notification
   - !input notify_actions
 
-  # Purple blinking: 10s before 20:00, 1 min from 20:00 to 09:00
+  # Purple blinking: 30s before 20:00, 1 min from 20:00 to 09:00
   - choose:
       - conditions:
           - condition: time
@@ -57,9 +57,9 @@ action:
                 - delay:
                     milliseconds: 500
     default:
-      # Before 20:00 (and after 09:00) = 10 seconds
+      # Before 20:00 (and after 09:00) = 30 seconds
       - repeat:
-          count: 10
+          count: 30
           sequence:
             - service: light.turn_on
               target: !input lights
