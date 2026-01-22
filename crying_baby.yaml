@@ -1,6 +1,6 @@
 blueprint:
   name: "Bebé (actividad en cuna)"
-  description: "Detecta movimiento durante màs de 2 segundos en la habitación del bebé y avisa: Notificación + Parpadeo VIOLETA. Antes de las 20:00 parpadea 10s. De 20:00 a 09:00 parpadea 1 minuto."
+  description: "Detecta movimiento durante màs de 2 segundos en la habitación del bebé y avisa: Notificación + Parpadeo VIOLETA. Antes de las 20:00 parpadea 30s. De 20:00 a 09:00 parpadea 1 minuto."
   domain: automation
   input:
     motion_sensor:
